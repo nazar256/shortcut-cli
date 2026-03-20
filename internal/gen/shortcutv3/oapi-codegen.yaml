@@ -1,0 +1,5 @@
+package: shortcutv3
+generate:
+  models: true
+  client: true
+output: shortcut.gen.go
