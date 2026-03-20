@@ -1,0 +1,7 @@
+.env
+.tmp/
+bin/
+dist/
+coverage.out
+shortcut
+shortcut-cli
