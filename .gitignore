@@ -3,5 +3,5 @@
 bin/
 dist/
 coverage.out
-shortcut
-shortcut-cli
+/shortcut
+/shortcut-cli
