@@ -60,7 +60,7 @@ jobs:
               -trimpath \
               -ldflags "-X github.com/nazar256/shortcut-cli/internal/cli.Version=${TAG} -X github.com/nazar256/shortcut-cli/internal/cli.Commit=${COMMIT} -X github.com/nazar256/shortcut-cli/internal/cli.BuildDate=${BUILD_DATE}" \
               -o "${tmpdir}/shortcut" \
-              ./cmd/shortcut
+              ./cmd/shortcut/main.go
 
             tar -C "${tmpdir}" -czf "dist/${name}.tar.gz" shortcut
             rm -rf "${tmpdir}"
