@@ -10,24 +10,18 @@ It gives you:
 
 ## Install
 
-### Quick install from GitHub Releases
+### Quick install (macOS/Linux)
 
-Install the latest release:
+Install the latest release using the provided install script:
 
 ```bash
-tmp="$(mktemp)" && \
-curl -fsSL https://github.com/nazar256/shortcut-cli/releases/latest/download/install.sh -o "$tmp" && \
-sh "$tmp" && \
-rm -f "$tmp"
+curl -fsSL https://raw.githubusercontent.com/nazar256/shortcut-cli/main/install.sh | sh
 ```
 
 Install a specific version:
 
 ```bash
-tmp="$(mktemp)" && \
-curl -fsSL https://github.com/nazar256/shortcut-cli/releases/download/v1.0.0/install.sh -o "$tmp" && \
-sh "$tmp" --version v1.0.0 && \
-rm -f "$tmp"
+curl -fsSL https://raw.githubusercontent.com/nazar256/shortcut-cli/v1.0.0/install.sh | sh -s -- --version v1.0.0
 ```
 
 The installer:
