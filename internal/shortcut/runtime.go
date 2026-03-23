@@ -18,10 +18,10 @@ type Runtime struct {
 	Formatter *output.Formatter
 }
 
-func NewRuntime(ctx context.Context, outputFormat string) (*Runtime, error) {
+func NewRuntime(ctx context.Context, outputFormat string, loadOptions config.LoadOptions) (*Runtime, error) {
 	_ = ctx
 
-	cfg, err := config.Load()
+	cfg, err := config.Load(loadOptions)
 	if err != nil {
 		return nil, err
 	}

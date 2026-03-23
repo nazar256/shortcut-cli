@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/nazar256/shortcut-cli/internal/config"
 	"github.com/nazar256/shortcut-cli/internal/openapi"
 	shortcutruntime "github.com/nazar256/shortcut-cli/internal/shortcut"
 	"github.com/spf13/cobra"
@@ -18,7 +19,13 @@ func outputFormat(cmd *cobra.Command) string {
 }
 
 func newRuntime(cmd *cobra.Command) (*shortcutruntime.Runtime, error) {
-	return shortcutruntime.NewRuntime(cmd.Context(), outputFormat(cmd))
+	envFilePath, _ := cmd.Root().PersistentFlags().GetString("env-file")
+	noEnvFile, _ := cmd.Root().PersistentFlags().GetBool("no-env-file")
+
+	return shortcutruntime.NewRuntime(cmd.Context(), outputFormat(cmd), config.LoadOptions{
+		EnvFilePath: envFilePath,
+		NoEnvFile:   noEnvFile,
+	})
 }
 
 func requireNoArgs(cmd *cobra.Command, args []string) error {

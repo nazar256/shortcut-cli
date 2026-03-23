@@ -29,6 +29,16 @@ func TestRootHelpDoesNotUseAIFriendlyLabel(t *testing.T) {
 	}
 }
 
+func TestRootHelpIncludesEnvFileFlags(t *testing.T) {
+	output := executeHelp(t, "--help")
+	if !strings.Contains(output, "--env-file") {
+		t.Fatalf("expected root help to include --env-file flag:\n%s", output)
+	}
+	if !strings.Contains(output, "--no-env-file") {
+		t.Fatalf("expected root help to include --no-env-file flag:\n%s", output)
+	}
+}
+
 func TestSearchHelpExplainsSearchFlow(t *testing.T) {
 	output := executeHelp(t, "search", "--help")
 	if !strings.Contains(output, "shortcut search syntax") {

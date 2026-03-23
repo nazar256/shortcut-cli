@@ -45,6 +45,8 @@ Use "{{.CommandPath}} [command] --help" for more information about a command.{{e
 	})
 
 	cmd.PersistentFlags().StringP("output", "o", "text", "Output format: text or json")
+	cmd.PersistentFlags().String("env-file", "", "Path to dotenv file (disables automatic ./.env and ~/.env search)")
+	cmd.PersistentFlags().Bool("no-env-file", false, "Disable dotenv loading entirely")
 
 	cmd.AddCommand(NewMeCmd())
 	cmd.AddCommand(NewDocsCmd())

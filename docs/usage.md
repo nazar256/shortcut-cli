@@ -25,7 +25,27 @@ Commands like `shortcut docs ...` and `shortcut version` work offline and do not
 
 ## Configuration
 
-The CLI reads configuration from environment variables and can also load a local `.env` file in the current working directory.
+The CLI reads configuration from environment variables and can also load dotenv files.
+
+Default dotenv search order (when no dotenv flags are passed):
+
+1. `./.env`
+2. `~/.env`
+
+If neither file exists, the CLI continues without error.
+
+Priority is:
+
+1. explicit CLI flags
+2. process environment variables
+3. dotenv values
+4. built-in defaults
+
+Notes:
+
+- `--env-file <path>` loads only that file and disables automatic search.
+- `--no-env-file` disables dotenv loading entirely.
+- Process environment variables always win over dotenv values, even when set to an empty string.
 
 Supported variables:
 
@@ -50,6 +70,8 @@ SHORTCUT_TIMEOUT=20s
 ## Global flags
 
 - `-o, --output text|json` — choose concise text or stable JSON output
+- `--env-file <path>` — load dotenv values only from the provided file
+- `--no-env-file` — skip dotenv loading entirely
 - `-h, --help` — show built-in help
 
 ## Top-level commands

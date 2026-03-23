@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 )
@@ -19,9 +20,16 @@ type Config struct {
 	Timeout  time.Duration
 }
 
+type LoadOptions struct {
+	EnvFilePath string
+	NoEnvFile   bool
+}
+
 // Load reads configuration from environment variables, optionally loading from a .env file first.
-func Load() (*Config, error) {
-	loadEnvFile()
+func Load(options LoadOptions) (*Config, error) {
+	if err := loadEnvFile(options); err != nil {
+		return nil, err
+	}
 
 	token := os.Getenv("SHORTCUT_API_TOKEN")
 	if token == "" {
@@ -47,12 +55,50 @@ func Load() (*Config, error) {
 	}, nil
 }
 
-// loadEnvFile attempts to load a .env file from the current directory.
+// loadEnvFile attempts to load environment values from dotenv files.
 // It does not override existing environment variables.
-func loadEnvFile() {
-	if err := loadEnv(".env"); err == nil {
-		return
+func loadEnvFile(options LoadOptions) error {
+	if options.NoEnvFile {
+		return nil
 	}
+
+	if options.EnvFilePath != "" {
+		if err := loadEnv(options.EnvFilePath); err != nil {
+			return fmt.Errorf("load env file %q: %w", options.EnvFilePath, err)
+		}
+		return nil
+	}
+
+	loaded, err := loadEnvIfExists(".env")
+	if err != nil {
+		return err
+	}
+	if loaded {
+		return nil
+	}
+
+	homeDir, err := os.UserHomeDir()
+	if err != nil || homeDir == "" {
+		return nil
+	}
+
+	_, err = loadEnvIfExists(filepath.Join(homeDir, ".env"))
+	return err
+}
+
+func loadEnvIfExists(filename string) (bool, error) {
+	if _, err := os.Stat(filename); err != nil {
+		if os.IsNotExist(err) {
+			return false, nil
+		}
+		return false, fmt.Errorf("stat env file %q: %w", filename, err)
+	}
+
+	if err := loadEnv(filename); err != nil {
+		return false, fmt.Errorf("load env file %q: %w", filename, err)
+	}
+
+	return true, nil
 }
 
 func loadEnv(filename string) error {
