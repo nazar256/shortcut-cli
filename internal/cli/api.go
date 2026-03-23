@@ -446,7 +446,7 @@ func buildOperationExamples(meta shortcutopenapi.CommandMetadata, prefix string)
 		if meta.IsMultipart {
 			base += " --form story_id=123 --file file0=./attachment.txt"
 		} else {
-			base += " --body '{\"name\":\"example\"}'"
+			base += " --body-file ./request.json"
 		}
 	}
 

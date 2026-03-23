@@ -4,13 +4,26 @@ Shortcut CLI exposes the official Shortcut REST API in a way that is easy to dis
 
 ## Installation
 
-Install the latest GitHub release:
+If the repository already has a published GitHub Release, you can install from the release assets:
 
 ```bash
-tmp="$(mktemp)" && \
-curl -fsSL https://github.com/nazar256/shortcut-cli/releases/latest/download/install.sh -o "$tmp" && \
-sh "$tmp" && \
-rm -f "$tmp"
+curl -fsSL https://github.com/nazar256/shortcut-cli/releases/latest/download/install.sh | sh
+```
+
+If the installer picks a directory that is not already on `PATH`, it prints the export command to run before you invoke `shortcut` from a new shell.
+
+Install a specific version:
+
+```bash
+curl -fsSL https://github.com/nazar256/shortcut-cli/releases/download/v1.0.0/install.sh | sh -s -- --version v1.0.0
+```
+
+If you prefer to inspect the installer before running it, download it first:
+
+```bash
+curl -fsSL https://github.com/nazar256/shortcut-cli/releases/latest/download/install.sh -o ./install-shortcut.sh
+sh ./install-shortcut.sh
+rm -f ./install-shortcut.sh
 ```
 
 Or install from source:
@@ -18,6 +31,12 @@ Or install from source:
 ```bash
 go install github.com/nazar256/shortcut-cli/cmd/shortcut@latest
 ```
+
+The source install path works even before the first public release exists.
+
+Building from source requires Go `1.25+`.
+
+Note: source installs do not inject release build metadata, so `shortcut version` usually reports `dev` / `unknown` values unless you build with ldflags.
 
 For release details, see [`docs/releasing.md`](releasing.md).
 
@@ -29,6 +48,13 @@ By default, the installer chooses the destination in this order:
 4. `~/bin`
 
 Commands like `shortcut docs ...` and `shortcut version` work offline and do not require a token.
+
+The CLI exposes both read and write operations. If you only need read-only verification, choose commands such as `shortcut me`, `shortcut workflows list`, `shortcut docs summary`, and read-only search/resource lookups.
+
+See also:
+
+- [`examples.md`](examples.md)
+- [`for-ai-agents.md`](for-ai-agents.md)
 
 ## Configuration
 
@@ -83,6 +109,8 @@ SHORTCUT_TIMEOUT=20s
 
 ## Top-level commands
 
+Main command groups:
+
 - `shortcut me` — get the authenticated member
 - `shortcut docs` — inspect embedded OpenAPI-derived docs
 - `shortcut version` — print CLI version info
@@ -92,6 +120,7 @@ SHORTCUT_TIMEOUT=20s
 - `shortcut iterations` — iteration commands
 - `shortcut workflows` — workflow commands
 - `shortcut search` — curated search commands with built-in syntax help
+- `shortcut completion` — generate shell completion scripts
 
 ## Discovering the CLI
 

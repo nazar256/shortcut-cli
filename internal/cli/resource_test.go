@@ -146,14 +146,14 @@ func TestCuratedMeTextSummaryIsReadable(t *testing.T) {
 	_, textPayload := shapeCuratedOperation(openapi.CommandMetadata{Name: "me", Group: "member"}, map[string]any{
 		"id":            float64(123456789012345),
 		"entity_type":   "member",
-		"name":          "Example Maintainer",
+		"name":          "Example Person",
 		"mention_name":  "example-user",
 		"email_address": "example@example.invalid",
 		"role":          "member",
 	}, curatedRenderOptions{})
 
 	for _, want := range []string{
-		"Member #123456789012345 Example Maintainer",
+		"Member #123456789012345 Example Person",
 		"Role: member",
 		"Mention: @example-user",
 		"Email: example@example.invalid",
@@ -185,7 +185,7 @@ func TestCuratedStoryHistorySummaryIsReadable(t *testing.T) {
 	_, textPayload := shapeCuratedOperation(openapi.CommandMetadata{Name: "history", Group: "stories"}, map[string]any{
 		"data": []any{
 			map[string]any{
-				"actor_name": "Example Maintainer",
+				"actor_name": "Example Person",
 				"changed_at": "2026-03-20T10:11:12Z",
 				"actions": []any{
 					map[string]any{"action": "update", "entity_type": "story", "name": "Example story"},
@@ -195,7 +195,7 @@ func TestCuratedStoryHistorySummaryIsReadable(t *testing.T) {
 		"total": float64(1),
 	}, curatedRenderOptions{})
 
-	for _, want := range []string{"Example Maintainer", "2026-03-20T10:11:12Z", "update story Example story"} {
+	for _, want := range []string{"Example Person", "2026-03-20T10:11:12Z", "update story Example story"} {
 		if !strings.Contains(textPayload, want) {
 			t.Fatalf("expected %q in history summary, got:\n%s", want, textPayload)
 		}
