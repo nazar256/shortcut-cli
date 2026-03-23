@@ -21,6 +21,13 @@ go install github.com/nazar256/shortcut-cli/cmd/shortcut@latest
 
 For release details, see [`docs/releasing.md`](releasing.md).
 
+By default, the installer chooses the destination in this order:
+
+1. `--install-dir <dir>` if provided
+2. the first writable canonical directory already present in `PATH`, excluding known language-managed bins such as `nvm`, configured/default pnpm and Cargo bins, and Go bin directories
+3. `~/.local/bin`
+4. `~/bin`
+
 Commands like `shortcut docs ...` and `shortcut version` work offline and do not require a token.
 
 ## Configuration

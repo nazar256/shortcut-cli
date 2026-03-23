@@ -29,7 +29,10 @@ The installer:
 - detects `amd64` or `arm64`
 - downloads the matching archive from GitHub Releases
 - verifies its SHA256 checksum
-- installs into a user-writable directory already in your `PATH` when possible
+- prefers a writable canonical directory already present in `PATH`
+- skips known language-managed install paths such as `nvm`, configured/default pnpm and Cargo bins, and Go bin directories
+- otherwise falls back to `~/.local/bin`, then `~/bin`
+- always lets `--install-dir` override the default location
 
 Supported release artifacts:
 - Linux amd64

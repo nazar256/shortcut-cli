@@ -75,6 +75,143 @@ dir_in_path() {
   esac
 }
 
+canonicalize_dir() {
+  dir="$1"
+  [ -d "${dir}" ] || return 1
+  (
+    cd "${dir}" 2>/dev/null && pwd -P
+  )
+}
+
+canonical_dirs_equal() {
+  candidate="$1"
+  other="$2"
+  canonical_other=$(canonicalize_dir "${other}" || true)
+  [ -n "${canonical_other}" ] || return 1
+  [ "${candidate}" = "${canonical_other}" ]
+}
+
+canonical_dir_within() {
+  candidate="$1"
+  other="$2"
+  canonical_other=$(canonicalize_dir "${other}" || true)
+  [ -n "${canonical_other}" ] || return 1
+  path_is_within "${candidate}" "${canonical_other}"
+}
+
+nvm_dir() {
+  if [ -n "${NVM_DIR:-}" ]; then
+    printf '%s' "${NVM_DIR}"
+    return
+  fi
+  printf '%s' "${HOME}/.nvm"
+}
+
+npm_global_bin_dir() {
+  if [ -n "${NPM_CONFIG_PREFIX:-}" ]; then
+    printf '%s/bin' "${NPM_CONFIG_PREFIX}"
+    return
+  fi
+  printf '%s' "${HOME}/.npm-global/bin"
+}
+
+yarn_global_bin_dir() {
+  if [ -n "${YARN_GLOBAL_FOLDER:-}" ]; then
+    printf '%s/bin' "${YARN_GLOBAL_FOLDER}"
+    return
+  fi
+  printf '%s' "${HOME}/.yarn/bin"
+}
+
+pnpm_home_dir() {
+  if [ -n "${PNPM_HOME:-}" ]; then
+    printf '%s' "${PNPM_HOME}"
+    return
+  fi
+  printf '%s' "${HOME}/.local/share/pnpm"
+}
+
+cargo_bin_dir() {
+  if [ -n "${CARGO_HOME:-}" ]; then
+    printf '%s/bin' "${CARGO_HOME}"
+    return
+  fi
+  printf '%s' "${HOME}/.cargo/bin"
+}
+
+path_is_within() {
+  path="$1"
+  prefix="$2"
+  case "${path}" in
+    "${prefix}"|"${prefix}"/*) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
+is_language_managed_dir() {
+  dir="$1"
+
+  if canonical_dir_within "${dir}" "$(nvm_dir)"; then
+    return 0
+  fi
+
+  case "${dir}" in
+    */node_modules/.bin|*/node_modules/.bin/*) return 0 ;;
+  esac
+
+  if canonical_dirs_equal "${dir}" "$(npm_global_bin_dir)"; then
+    return 0
+  fi
+
+  if canonical_dirs_equal "${dir}" "$(yarn_global_bin_dir)"; then
+    return 0
+  fi
+
+  if canonical_dirs_equal "${dir}" "$(pnpm_home_dir)"; then
+    return 0
+  fi
+
+  if canonical_dirs_equal "${dir}" "$(cargo_bin_dir)"; then
+    return 0
+  fi
+
+  if [ -n "${GOBIN:-}" ] && canonical_dirs_equal "${dir}" "${GOBIN}"; then
+    return 0
+  fi
+
+  old_ifs=${IFS}
+  IFS=:
+  for go_path in ${GOPATH:-${HOME}/go}; do
+    [ -n "${go_path}" ] || continue
+    if canonical_dirs_equal "${dir}" "${go_path}/bin"; then
+      IFS=${old_ifs}
+      return 0
+    fi
+  done
+  IFS=${old_ifs}
+
+  return 1
+}
+
+canonical_dir_in_path() {
+  target="$1"
+
+  old_ifs=${IFS}
+  IFS=:
+  for candidate in ${PATH}; do
+    [ -n "${candidate}" ] || continue
+    canonical_candidate=$(canonicalize_dir "${candidate}" || true)
+    [ -n "${canonical_candidate}" ] || continue
+    if [ "${canonical_candidate}" = "${target}" ]; then
+      IFS=${old_ifs}
+      return 0
+    fi
+  done
+  IFS=${old_ifs}
+
+  return 1
+}
+
 choose_install_dir() {
   if [ -n "${INSTALL_DIR}" ]; then
     mkdir -p "${INSTALL_DIR}"
@@ -87,9 +224,14 @@ choose_install_dir() {
   IFS=:
   for candidate in ${PATH}; do
     [ -n "${candidate}" ] || continue
-    if is_writable_dir "${candidate}"; then
+    canonical_candidate=$(canonicalize_dir "${candidate}" || true)
+    [ -n "${canonical_candidate}" ] || continue
+    if is_language_managed_dir "${canonical_candidate}"; then
+      continue
+    fi
+    if is_writable_dir "${canonical_candidate}"; then
       IFS=${old_ifs}
-      printf '%s' "${candidate}"
+      printf '%s' "${canonical_candidate}"
       return
     fi
   done
@@ -97,8 +239,10 @@ choose_install_dir() {
 
   for fallback in "${HOME}/.local/bin" "${HOME}/bin"; do
     mkdir -p "${fallback}"
-    if is_writable_dir "${fallback}"; then
-      printf '%s' "${fallback}"
+    canonical_fallback=$(canonicalize_dir "${fallback}" || true)
+    [ -n "${canonical_fallback}" ] || continue
+    if is_writable_dir "${canonical_fallback}"; then
+      printf '%s' "${canonical_fallback}"
       return
     fi
   done
@@ -187,7 +331,7 @@ tar -xzf "${ARCHIVE_PATH}" -C "${tmpdir}"
 install -m 0755 "${tmpdir}/${BINARY_NAME}" "${TARGET_DIR}/${BINARY_NAME}"
 
 log "Installed to ${TARGET_DIR}/${BINARY_NAME}"
-if dir_in_path "${TARGET_DIR}"; then
+if canonical_dir_in_path "${TARGET_DIR}" || dir_in_path "${TARGET_DIR}"; then
   "${TARGET_DIR}/${BINARY_NAME}" version
 else
   log "${TARGET_DIR} is not currently in PATH"
