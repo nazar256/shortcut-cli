@@ -33,7 +33,7 @@ make dist VERSION=v1.0.0 COMMIT=$(git rev-parse HEAD)
 - Public installer: `install.sh`
 - Default install path policy:
   1. explicit `--install-dir`
-  2. first writable directory already in `PATH`
+  2. first writable canonical directory already in `PATH`, excluding known language-managed bins (for example nvm, configured/default pnpm and cargo bins, Go bin dirs)
   3. `~/.local/bin`
   4. `~/bin`
 - Installer verifies archive checksum before extraction.
