@@ -39,6 +39,13 @@ func TestRootHelpIncludesEnvFileFlags(t *testing.T) {
 	}
 }
 
+func TestRootVersionFlagWorks(t *testing.T) {
+	output := executeHelp(t, "--version")
+	if !strings.Contains(output, Version) {
+		t.Fatalf("expected --version output to include %q, got %q", Version, output)
+	}
+}
+
 func TestSearchHelpExplainsSearchFlow(t *testing.T) {
 	output := executeHelp(t, "search", "--help")
 	if !strings.Contains(output, "shortcut search syntax") {

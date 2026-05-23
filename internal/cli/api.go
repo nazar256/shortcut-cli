@@ -84,6 +84,10 @@ func buildOperationCmdForPrefix(meta shortcutopenapi.CommandMetadata, prefix str
 		Args:    cobra.ExactArgs(len(meta.PathParameters())),
 		Example: buildOperationExamples(meta, prefix),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if err := requireDestructiveConfirmation(cmd, meta); err != nil {
+				return err
+			}
+
 			runtime, err := newRuntime(cmd)
 			if err != nil {
 				return err
@@ -126,8 +130,26 @@ func buildOperationCmdForPrefix(meta shortcutopenapi.CommandMetadata, prefix str
 			cmd.Flags().String("body-file", "", "Read JSON request body from file")
 		}
 	}
+	if isDestructiveOperation(meta) {
+		cmd.Flags().Bool("yes", false, "Confirm this destructive API operation")
+	}
 
 	return cmd
+}
+
+func isDestructiveOperation(meta shortcutopenapi.CommandMetadata) bool {
+	return strings.EqualFold(meta.Method, http.MethodDelete)
+}
+
+func requireDestructiveConfirmation(cmd *cobra.Command, meta shortcutopenapi.CommandMetadata) error {
+	if !isDestructiveOperation(meta) {
+		return nil
+	}
+	yes, _ := cmd.Flags().GetBool("yes")
+	if yes {
+		return nil
+	}
+	return fmt.Errorf("%s %s is destructive; re-run with --yes to confirm", meta.Method, meta.Path)
 }
 
 func addParameterFlag(cmd *cobra.Command, param shortcutopenapi.CommandParameter) {
@@ -236,7 +258,7 @@ func invokeOperation(runtime *shortcutruntime.Runtime, cmd *cobra.Command, meta 
 
 	response, err := runtime.GetHTTP().Do(req)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("request failed: %w", err)
 	}
 	defer response.Body.Close()
 

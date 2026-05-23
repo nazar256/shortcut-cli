@@ -8,7 +8,7 @@ Use this checklist before publicly promoting the repository.
 - [x] Usage, examples, AI-agent guidance, release docs, and metadata guidance exist under `docs/`.
 - [x] Installer script and release workflow are documented.
 - [x] `CONTRIBUTING.md` and `SECURITY.md` exist.
-- [ ] Choose a license and add `LICENSE`.
+- [x] Choose a license and add `LICENSE`.
 - [ ] Enable GitHub private vulnerability reporting before public launch, then update `SECURITY.md` if you add another private contact path.
 
 ## Release readiness

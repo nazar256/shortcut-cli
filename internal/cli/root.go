@@ -36,9 +36,11 @@ Use "{{.CommandPath}} [command] --help" for more information about a command.{{e
 		Short:         "Shortcut CLI",
 		Long:          "Shortcut CLI for the official Shortcut REST API, with built-in help, concise defaults, and stable JSON output.",
 		Example:       "  shortcut me\n  shortcut stories get 123\n  shortcut search stories --query 'id:sc-12345'\n  shortcut search syntax",
+		Version:       Version,
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
+	cmd.SetVersionTemplate("{{.Version}}\n")
 
 	cmd.SetFlagErrorFunc(func(command *cobra.Command, err error) error {
 		return fmt.Errorf("%w\n\nRun `%s --help` for usage", err, command.CommandPath())

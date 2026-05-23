@@ -22,3 +22,11 @@ jobs:
 
       - name: Run tests
         run: go test ./...
+
+      - name: Build CLI
+        run: go build -o shortcut ./cmd/shortcut/main.go
+
+      - name: Smoke test CLI
+        run: |
+          ./shortcut --version
+          ./shortcut docs summary

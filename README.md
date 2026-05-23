@@ -72,7 +72,7 @@ Note: source installs do not inject release build metadata, so `shortcut version
 Set your Shortcut API token:
 
 ```bash
-export SHORTCUT_API_TOKEN="your_token"
+export SHORTCUT_API_TOKEN="YOUR_API_TOKEN"
 ```
 
 Or copy `.env.example` to `.env` in the directory where you run the CLI.
@@ -80,7 +80,7 @@ Or copy `.env.example` to `.env` in the directory where you run the CLI.
 If you are not working from a repository checkout, create `.env` manually:
 
 ```env
-SHORTCUT_API_TOKEN=your_token
+SHORTCUT_API_TOKEN=YOUR_API_TOKEN
 SHORTCUT_TIMEOUT=20s
 ```
 
@@ -173,6 +173,12 @@ Project layout:
 
 Do not hand-edit generated files under `internal/gen/shortcutv3/`.
 
+## Troubleshooting
+
+- `missing SHORTCUT_API_TOKEN`: export `SHORTCUT_API_TOKEN` or create a local `.env` from `.env.example`.
+- Authentication failures: generate a fresh Shortcut API token and confirm your shell has the expected environment variable.
+- Network/API failures: retry with `-o json` for structured errors, and use `SHORTCUT_BASE_URL` only for testing against a known-compatible API endpoint.
+
 ## Release model
 
 Pushing a version tag triggers the release workflow, which:
@@ -182,3 +188,7 @@ Pushing a version tag triggers the release workflow, which:
 - generates a checksum manifest
 - creates or updates a draft GitHub Release for that tag
 - uploads archives, checksums, and `install.sh` to the draft release
+
+## License
+
+MIT. See [`LICENSE`](LICENSE).

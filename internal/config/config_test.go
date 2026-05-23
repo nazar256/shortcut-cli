@@ -10,6 +10,11 @@ import (
 
 func TestLoad(t *testing.T) {
 	t.Run("missing token", func(t *testing.T) {
+		workDir := t.TempDir()
+		homeDir := t.TempDir()
+		chdir(t, workDir)
+		t.Setenv("HOME", homeDir)
+
 		unsetEnv(t, "SHORTCUT_API_TOKEN", "SHORTCUT_BASE_URL", "SHORTCUT_TIMEOUT")
 
 		_, err := Load(LoadOptions{})

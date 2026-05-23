@@ -22,7 +22,7 @@ shortcut api stories get-story --help
 ## Basic auth and connectivity checks
 
 ```bash
-export SHORTCUT_API_TOKEN="your_token"
+export SHORTCUT_API_TOKEN="YOUR_API_TOKEN"
 shortcut me
 shortcut me -o json
 ```
@@ -36,7 +36,7 @@ shortcut me
 Create `.env` manually unless you are already in a repository checkout:
 
 ```env
-SHORTCUT_API_TOKEN=your_token
+SHORTCUT_API_TOKEN=YOUR_API_TOKEN
 SHORTCUT_TIMEOUT=20s
 ```
 

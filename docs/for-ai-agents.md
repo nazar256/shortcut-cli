@@ -18,7 +18,7 @@ shortcut api --help
 2. Authenticate with an environment variable or `.env` file:
 
 ```bash
-export SHORTCUT_API_TOKEN="your_token"
+export SHORTCUT_API_TOKEN="YOUR_API_TOKEN"
 ```
 
 The CLI also auto-loads `./.env` and `~/.env` unless `--env-file` or `--no-env-file` is used.

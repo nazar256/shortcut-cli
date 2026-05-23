@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/nazar256/shortcut-cli/internal/openapi"
@@ -70,5 +71,49 @@ func TestBuildOperationCmdUseIncludesPathArgs(t *testing.T) {
 	cmd := buildOperationCmd(meta)
 	if got, want := cmd.Use, "get-epic <epic-public-id>"; got != want {
 		t.Fatalf("unexpected use string: got %q want %q", got, want)
+	}
+}
+
+func TestBuildOperationCmdAddsYesFlagForDelete(t *testing.T) {
+	meta := openapi.CommandMetadata{
+		OperationID: "deleteStory",
+		Name:        "delete-story",
+		Method:      "DELETE",
+		Path:        "/api/v3/stories/{story-public-id}",
+		Summary:     "Delete Story",
+		Group:       "stories",
+		Parameters: []openapi.CommandParameter{
+			{Name: "story-public-id", In: "path", Required: true, Type: "integer"},
+		},
+	}
+
+	cmd := buildOperationCmd(meta)
+	if cmd.Flags().Lookup("yes") == nil {
+		t.Fatal("expected delete operation to have --yes flag")
+	}
+}
+
+func TestDeleteOperationRequiresYes(t *testing.T) {
+	meta := openapi.CommandMetadata{
+		OperationID: "deleteStory",
+		Name:        "delete-story",
+		Method:      "DELETE",
+		Path:        "/api/v3/stories/{story-public-id}",
+		Summary:     "Delete Story",
+		Group:       "stories",
+	}
+
+	cmd := buildOperationCmd(meta)
+	if err := requireDestructiveConfirmation(cmd, meta); err == nil {
+		t.Fatal("expected delete operation to require confirmation")
+	} else if !strings.Contains(err.Error(), "--yes") {
+		t.Fatalf("expected --yes guidance, got %v", err)
+	}
+
+	if err := cmd.Flags().Set("yes", "true"); err != nil {
+		t.Fatalf("set --yes: %v", err)
+	}
+	if err := requireDestructiveConfirmation(cmd, meta); err != nil {
+		t.Fatalf("expected --yes to confirm delete operation: %v", err)
 	}
 }
